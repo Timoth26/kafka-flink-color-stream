@@ -33,7 +33,12 @@ func main() {
 		Topic:    topic,
 		Balancer: &kafka.LeastBytes{},
 	}
-	defer writer.Close()
+
+	defer func() {
+		if err := writer.Close(); err != nil {
+			log.Printf("Error closing Kafka connection: %v", err)
+		}
+	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	signalChan := make(chan os.Signal, 1)
