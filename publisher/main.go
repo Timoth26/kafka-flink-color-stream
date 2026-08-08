@@ -65,7 +65,7 @@ func main() {
 			// Payload
 			event := ColorEvent{
 				Color:     randomColor,
-				Count:     1,
+				Count:     rand.Intn(5) + 1,
 				Timestamp: time.Now().UnixMilli(),
 			}
 
