@@ -36,10 +36,33 @@ class ColorAggregator(KeyedProcessFunction):
         )
 
     def process_element(self, value, ctx: "KeyedProcessFunction.Context"):
-        pass
+        data = json.loads(value)
+        count = data["count"]
+        timestamp = data["timestamp"]
+
+        current_window = self.window_state.value() or 0
+        self.window_state.update(current_window + count)
+
+        current_cumul = self.cumulative_state.value() or 0
+        self.cumulative_state.update(current_cumul + count)
+
+        window_end = timestamp - (timestamp % self.window_size_ms) + self.window_size_ms
+        ctx.timer_service().register_event_time_timer(window_end)
 
     def on_timer(self, timestamp, ctx: "KeyedProcessFunction.OnTimerContext"):
-        pass
+        color = ctx.get_current_key()
+        window_count = self.window_state.value() or 0
+        cumulative_count = self.cumulative_state.value() or 0
+
+        self.window_state.clear()
+
+        if window_count > 0:
+            result = {
+                "color": color,
+                "window_count": window_count,
+                "cumulative_count": cumulative_count,
+            }
+            yield json.dumps(result)
 
 
 def extract_key(value):
