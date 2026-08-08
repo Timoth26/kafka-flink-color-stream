@@ -8,8 +8,14 @@ on:
 
 jobs:
   build-golang:
-    name: Build & Test Golang
+    name: Build & Test Golang - ${{ matrix.app }}
     runs-on: ubuntu-26.04
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [publisher, subscriber]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,11 +28,11 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          working-directory: publisher
+          working-directory: ${{ matrix.app }}
           version: v2.12.2
 
-      - name: Build Publisher
-        working-directory: ./publisher
+      - name: Build ${{ matrix.app }}
+        working-directory: ./${{ matrix.app }}
         run: |
           go mod tidy
-          go build -v -o publisher-bin main.go
+          go build -v -o ${{ matrix.app }}-bin main.go
