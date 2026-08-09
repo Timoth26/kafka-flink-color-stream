@@ -1,4 +1,4 @@
-name: Verify Golang Environment
+name: Verify Environment
 
 on:
   push:
