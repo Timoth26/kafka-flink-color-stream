@@ -20,12 +20,18 @@ type AggregatedEvent struct {
 }
 
 const (
-	brokerAddress = "localhost:9092"
-	topic         = "output-color-stats"
-	groupID       = "color-display-group"
+	topic   = "output-color-stats"
+	groupID = "color-display-group"
 )
 
 func main() {
+	brokerAddress := os.Getenv("KAFKA_BROKER")
+	if brokerAddress == "" {
+		brokerAddress = "localhost:9092"
+	}
+
+	log.Printf("Starting subscriber, connecting to Kafka broker: %s", brokerAddress)
+
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{brokerAddress},
 		Topic:    topic,

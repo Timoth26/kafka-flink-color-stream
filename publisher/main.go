@@ -21,17 +21,24 @@ type ColorEvent struct {
 }
 
 const (
-	brokerAddress = "localhost:9092"
-	topic         = "input-color-events"
+	topic = "input-color-events"
 )
 
 func main() {
+	brokerAddress := os.Getenv("KAFKA_BROKER")
+	if brokerAddress == "" {
+		brokerAddress = "localhost:9092"
+	}
+
+	log.Printf("Starting publisher, connecting to Kafka broker: %s on topic %s...", brokerAddress, topic)
+
 	colors := []string{"red", "green", "blue", "yellow", "purple", "orange", "pink", "brown", "black", "white"}
 
 	writer := &kafka.Writer{
-		Addr:     kafka.TCP(brokerAddress),
-		Topic:    topic,
-		Balancer: &kafka.LeastBytes{},
+		Addr:                   kafka.TCP(brokerAddress),
+		Topic:                  topic,
+		Balancer:               &kafka.LeastBytes{},
+		AllowAutoTopicCreation: true,
 	}
 
 	defer func() {

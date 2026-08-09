@@ -10,6 +10,7 @@ KAFKA_CONTAINER = kafka
 .PHONY: up down run-publisher setup-topics 
 
 run:
+	$(MAKE) down
 	$(MAKE) up
 	$(MAKE) wait-for-kafka
 	$(MAKE) setup-topics
@@ -27,6 +28,9 @@ run-publisher:
 run-subscriber:
 	cd subscriber && go run main.go
 
+rebuild:
+	docker-compose build --no-cache
+
 setup-topics:
 	docker exec $(KAFKA_CONTAINER) kafka-topics --create --if-not-exists --topic $(INPUT_TOPIC) --bootstrap-server $(KAFKA_BROKER) --partitions 1 --replication-factor 1
 	docker exec $(KAFKA_CONTAINER) kafka-topics --create --if-not-exists --topic $(OUTPUT_TOPIC) --bootstrap-server $(KAFKA_BROKER) --partitions 1 --replication-factor 1
@@ -38,3 +42,9 @@ wait-for-kafka:
 
 run-flink:
 	docker exec -it flink-jobmanager flink run --python /app/main.py
+
+logs-publisher:
+	docker logs -f golang-publisher
+
+logs-subscriber:
+	docker logs -f golang-subscriber

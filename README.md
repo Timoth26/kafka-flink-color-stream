@@ -34,18 +34,18 @@ Bring up Zookeeper, Kafka, and the Flink Cluster (JobManager & TaskManager). Thi
 make run
 ```
 
-**3. Run the Publisher (Dashboard)**
-Open a second terminal and start the Golang Publisher. You should see the Publisher logging emitted color events in this terminal
+**3. Monitor the Publisher Logs**
+Since the Publisher is already running in the background, open a second terminal and tail its logs. You should see the emitted real-time color events being sent to Kafka.
 
 ```bash
-make run-publisher
+make logs-publisher
 ```
 
-**4. Run the Subscriber (Dashboard)**
-Open a third terminal and start the Golang Subscriber to listen for processed results.
+**4. Monitor the Subscriber Logs**
+Open a third terminal and tail the Golang Subscriber logs. This will act as your real-time dashboard, displaying the processed and aggregated results as they arrive.
 
 ```bash
-make run-subscriber
+make logs-subscriber
 ```
 
 **5. Observe the Results**
@@ -53,3 +53,4 @@ Wait for the first 10-second window to close. In the Subscriber terminal, you wi
 window_count: The count of a specific color within the last 10 seconds.\
 cumulative_count: The running total of a specific color since the job started.\
 You can also monitor the job's DAG and metrics in the Flink Web UI at http://localhost:8081.
+
