@@ -53,3 +53,23 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: ${FLINK_TASK_SLOTS:-2}
+
+  publisher:
+      build:
+        context: ./publisher
+        dockerfile: Dockerfile
+      container_name: golang-publisher
+      depends_on:
+        - kafka
+      environment:
+        - KAFKA_BROKER=kafka:29092
+
+  subscriber:
+      build:
+        context: ./subscriber
+        dockerfile: Dockerfile
+      container_name: golang-subscriber
+      depends_on:
+        - kafka
+      environment:
+        - KAFKA_BROKER=kafka:29092
