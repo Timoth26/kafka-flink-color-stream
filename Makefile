@@ -17,10 +17,10 @@ run:
 	$(MAKE) run-flink
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 down:
-	docker-compose down -v
+	docker compose down -v
 
 run-publisher:
 	cd publisher && go run main.go
@@ -29,7 +29,7 @@ run-subscriber:
 	cd subscriber && go run main.go
 
 rebuild:
-	docker-compose build --no-cache
+	docker compose build --no-cache
 
 setup-topics:
 	docker exec $(KAFKA_CONTAINER) kafka-topics --create --if-not-exists --topic $(INPUT_TOPIC) --bootstrap-server $(KAFKA_BROKER) --partitions 1 --replication-factor 1
