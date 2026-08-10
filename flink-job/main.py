@@ -76,7 +76,7 @@ def main():
         KafkaSource.builder()
         .set_bootstrap_servers("kafka:29092")
         .set_topics("input-color-events")
-        .set_group_id("flink-python-group")
+        .set_group_id("output-color-stats")
         .set_starting_offsets(KafkaOffsetsInitializer.latest())
         .set_value_only_deserializer(SimpleStringSchema())
         .build()
