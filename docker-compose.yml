@@ -1,24 +1,20 @@
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.13
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
   kafka:
     image: confluentinc/cp-kafka:7.5.16
     container_name: kafka
-    depends_on:
-      - zookeeper
     ports:
       - "${KAFKA_PORT:-9092}:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:${KAFKA_PORT:-9092}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:${KAFKA_PORT:-9092}'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   jobmanager:
@@ -53,21 +49,21 @@ services:
         taskmanager.numberOfTaskSlots: ${FLINK_TASK_SLOTS:-2}
 
   publisher:
-      build:
-        context: ./publisher
-        dockerfile: Dockerfile
-      container_name: golang-publisher
-      depends_on:
-        - kafka
-      environment:
-        - KAFKA_BROKER=kafka:29092
+    build:
+      context: ./publisher
+      dockerfile: Dockerfile
+    container_name: golang-publisher
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=kafka:29092
 
   subscriber:
-      build:
-        context: ./subscriber
-        dockerfile: Dockerfile
-      container_name: golang-subscriber
-      depends_on:
-        - kafka
-      environment:
-        - KAFKA_BROKER=kafka:29092
+    build:
+      context: ./subscriber
+      dockerfile: Dockerfile
+    container_name: golang-subscriber
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=kafka:29092
